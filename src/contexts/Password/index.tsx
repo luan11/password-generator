@@ -75,6 +75,7 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 
 	function toggleLetters(enable: boolean) {
 		setCustom(false);
+		saveOption('custom', false);
 
 		if (customContent !== '') {
 			setCustomContent('');
@@ -92,6 +93,7 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 
 	function toggleUppercase(enable: boolean) {
 		setCustom(false);
+		saveOption('custom', false);
 
 		if (customContent !== '') {
 			setCustomContent('');
@@ -109,6 +111,7 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 
 	function toggleNumbers(enable: boolean) {
 		setCustom(false);
+		saveOption('custom', false);
 
 		if (customContent !== '') {
 			setCustomContent('');
@@ -126,6 +129,7 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 
 	function toggleSpecial(enable: boolean) {
 		setCustom(false);
+		saveOption('custom', false);
 
 		if (customContent !== '') {
 			setCustomContent('');
