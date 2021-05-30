@@ -9,6 +9,7 @@ const GlobalStyle = createGlobalStyle`
 
 	:root {
 		--acqua-green: #19A6A5;
+		--acqua-green-dark: #283038;
 		--light-green: #A8FE75;
 
 		--body: #1d2227;
@@ -24,6 +25,7 @@ const GlobalStyle = createGlobalStyle`
 		background: var(--body);
 	}
 
+	button,
 	input,
 	textarea,
 	select {

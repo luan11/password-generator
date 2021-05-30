@@ -12,8 +12,13 @@ export const Title = styled.h1`
 	color: var(--light-green);
 	margin: 0;
 	line-height: 150%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
 	>span {
+		display: inline-block;
 		color: var(--acqua-green);
+		margin-left: 0.5rem;
 	}
 `;

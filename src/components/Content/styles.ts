@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const Container = styled.div`
 	width: 100%;
-	margin: 0 auto 2rem;
+	margin: 0 auto;
 	padding: 6rem 1rem;
 
 	@media (min-width: 576px) {
@@ -19,8 +19,11 @@ export const Container = styled.div`
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
 		column-gap: 2rem;
-		margin-bottom: 0;
 		align-items: flex-start;
+
+		>div {
+			margin-bottom: 0;
+		}
 	}
 
 	@media (min-width: 1140px) {
@@ -39,6 +42,7 @@ export const Container = styled.div`
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
+		margin-bottom: 2rem;
 
 		>h2 {
 			width: 100%;
