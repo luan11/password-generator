@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 
 export interface PasswordContextData {
+	theme: string;
 	letters: boolean;
 	uppercase: boolean;
 	numbers: boolean;
@@ -9,6 +10,7 @@ export interface PasswordContextData {
 	customContent: string;
 	length: number;
 	generated: string;
+	handleTheme: (choose: string) => void;
 	toggleLetters: (enable: boolean) => void;
 	toggleUppercase: (enable: boolean) => void;
 	toggleNumbers: (enable: boolean) => void;

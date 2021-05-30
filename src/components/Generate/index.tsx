@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 import { usePasswordContext } from './../../contexts/Password';
 
@@ -20,15 +20,6 @@ export function Generate() {
   } = usePasswordContext();
 
   const inputPasswordRef = useRef<HTMLInputElement>(null);
-  const buttonGenerateRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    const button = buttonGenerateRef.current;
-
-    if (button) {
-      button.click();
-    }
-  }, []);
 
   function copy() {
     const password = inputPasswordRef.current;
@@ -81,7 +72,6 @@ export function Generate() {
       </Group>
 
       <Button
-        ref={buttonGenerateRef}
         type="button"
         disabled={!isAbleToGenerate()}
         style={{

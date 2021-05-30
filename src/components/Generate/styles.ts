@@ -20,8 +20,8 @@ export const Group = styled.div`
 
 	>button {
 		position: absolute;
-		right: -1px;
-		bottom: -1px;
+		right: 0;
+		bottom: 0;
 	}
 `;
 
@@ -61,6 +61,12 @@ export const Button = styled.button`
 	align-items: center;
 	text-align: center;
 	justify-content: center;
+	transition: all .45s;
+
+	&:hover {
+		background-color: var(--acqua-green);
+		border-color: var(--acqua-green);
+	}
 
 	>span {
 		display: inline-block;

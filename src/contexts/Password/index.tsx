@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
 import escapeStringRegexp from 'escape-string-regexp';
 import RandExp from 'randexp';
 
@@ -7,6 +7,8 @@ import { PasswordContextData, PasswordProviderProps } from './types';
 export const PasswordContext = createContext({} as PasswordContextData);
 
 export function PasswordProvider({ children }: PasswordProviderProps) {
+	const [theme, setTheme] = useState('');
+
 	const [letters, setLetters] = useState(true);
 	const [uppercase, setUppercase] = useState(true);
 	const [numbers, setNumbers] = useState(true);
@@ -18,11 +20,65 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 
 	const [generated, setGenerated] = useState('');
 
+	useEffect(() => {
+		const storageName = 'password-generator';
+		const storage = window.localStorage.getItem(storageName);
+
+		const data = storage ? JSON.parse(storage) : false;
+
+		if (data) {
+			const {
+				letters,
+				uppercase,
+				numbers,
+				special,
+				custom,
+				customContent,
+				length,
+				theme
+			} = data;
+
+			setLetters(letters);
+			setUppercase(uppercase);
+			setNumbers(numbers);
+			setSpecial(special);
+			setCustom(custom);
+			setCustomContent(customContent);
+			setLength(length);
+			setTheme(theme);
+
+			if (theme) {
+				const body = document.querySelector('body');
+
+				if (body) {
+					body.classList.add(theme);
+				}
+			}
+		}
+	}, []);
+
+	function handleTheme(choose: string) {
+		setTheme(choose);
+
+		saveOption('theme', choose);
+
+		const body = document.querySelector('body');
+
+		if (body) {
+			if (choose) {
+				body.classList.add(choose);
+			} else {
+				body.removeAttribute('class');
+			}
+		}
+	}
+
 	function toggleLetters(enable: boolean) {
 		setCustom(false);
 
 		if (customContent !== '') {
 			setCustomContent('');
+			saveOption('customContent', '');
 		}
 
 		if (generated !== '') {
@@ -30,6 +86,8 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 		}
 
 		setLetters(enable);
+
+		saveOption('letters', enable);
 	}
 
 	function toggleUppercase(enable: boolean) {
@@ -37,6 +95,7 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 
 		if (customContent !== '') {
 			setCustomContent('');
+			saveOption('customContent', '');
 		}
 
 		if (generated !== '') {
@@ -44,6 +103,8 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 		}
 
 		setUppercase(enable);
+
+		saveOption('uppercase', enable);
 	}
 
 	function toggleNumbers(enable: boolean) {
@@ -51,6 +112,7 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 
 		if (customContent !== '') {
 			setCustomContent('');
+			saveOption('customContent', '');
 		}
 
 		if (generated !== '') {
@@ -58,6 +120,8 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 		}
 
 		setNumbers(enable);
+
+		saveOption('numbers', enable);
 	}
 
 	function toggleSpecial(enable: boolean) {
@@ -65,6 +129,7 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 
 		if (customContent !== '') {
 			setCustomContent('');
+			saveOption('customContent', '');
 		}
 
 		if (generated !== '') {
@@ -72,6 +137,8 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 		}
 
 		setSpecial(enable);
+
+		saveOption('special', enable);
 	}
 
 	function toggleCustom(enable: boolean) {
@@ -85,14 +152,20 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 		}
 
 		setCustom(enable);
+
+		saveOption('custom', enable);
 	}
 
 	function handleCustomContent(value: string) {
 		setCustomContent(value);
+
+		saveOption('customContent', value);
 	}
 
 	function handleLength(value: number) {
 		setLength(value);
+
+		saveOption('length', value);
 
 		generate(value);
 	}
@@ -153,8 +226,38 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 		setGenerated(gen);
 	}
 
+	function saveOption(option: string, value: boolean | string | number) {
+		const updatedAt = new Date();
+
+		const storageName = 'password-generator';
+		const storage = window.localStorage.getItem(storageName);
+
+		const data = storage ? JSON.parse(storage) : {
+			letters,
+			uppercase,
+			numbers,
+			special,
+			custom,
+			customContent,
+			length,
+			theme: ''
+		};
+
+		const updatedData = {
+			...data, ...{
+				[option]: value,
+				updatedAt: updatedAt.toISOString()
+			}
+		};
+
+		const updatedDataJSON = JSON.stringify(updatedData);
+
+		window.localStorage.setItem(storageName, updatedDataJSON);
+	}
+
 	return (
 		<PasswordContext.Provider value={{
+			theme,
 			letters,
 			uppercase,
 			numbers,
@@ -163,6 +266,7 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 			customContent,
 			length,
 			generated,
+			handleTheme,
 			toggleLetters,
 			toggleUppercase,
 			toggleNumbers,

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const Container = styled.div`
 	width: 100%;
 	margin: 0 auto;
-	padding: 6rem 1rem;
+	padding: 3rem 1rem;
 
 	@media (min-width: 576px) {
 		width: 540px;
@@ -14,6 +14,8 @@ export const Container = styled.div`
 	}
 
 	@media (min-width: 992px) {
+		padding-top: 6rem;
+		padding-bottom: 6rem;
 		width: 960px;
 		height: calc(100vh - 80px);
 		display: grid;
@@ -43,6 +45,15 @@ export const Container = styled.div`
 		flex-direction: column;
 		align-items: flex-start;
 		margin-bottom: 2rem;
+
+		@media (max-width: 991px) {
+			padding: 1.5rem 3rem;
+		}
+
+		.light & {
+			box-shadow: none;
+			border: 1px solid var(--acqua-green-dark);
+		}
 
 		>h2 {
 			width: 100%;
