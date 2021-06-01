@@ -9,7 +9,7 @@ export const Container = styled.header`
 	align-items: center;
 
 	@media (max-width: 480px) {
-		justify-content: space-between;
+		flex-direction: column;
 	}
 `;
 
@@ -25,6 +25,7 @@ export const Title = styled.h1`
 
 	@media (max-width: 480px) {
 		font-size: 1.35rem;
+		margin-bottom: 1rem;
 	}
 
 	>span {
@@ -50,5 +51,22 @@ export const Button = styled.button`
 
 	&:hover {
 		color: var(--light-green);
+	}
+`;
+
+export const A = styled.a`
+	background: transparent;
+	border: 0;
+	padding: 0;
+	font-size: 2rem;
+	color: var(--text);
+	cursor: pointer;
+	transition: all .35s;
+	line-height: 100%;
+	color: var(--light-green);
+	margin-left: 1rem;
+
+	&:hover {
+		color: var(--acqua-green);
 	}
 `;
