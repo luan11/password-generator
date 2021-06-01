@@ -2,7 +2,76 @@ import { createContext, useState, useContext, useEffect } from 'react';
 import escapeStringRegexp from 'escape-string-regexp';
 import RandExp from 'randexp';
 
-import { PasswordContextData, PasswordProviderProps } from './types';
+import { PasswordContextData, PasswordProviderProps, GenerateData } from './types';
+
+function saveOption(option: string, value: boolean | string | number, initial: {}) {
+	const updatedAt = new Date();
+
+	const storageName = 'password-generator';
+	const storage = window.localStorage.getItem(storageName);
+
+	const data = storage ? JSON.parse(storage) : initial;
+
+	const updatedData = {
+		...data, ...{
+			[option]: value,
+			updatedAt: updatedAt.toISOString()
+		}
+	};
+
+	const updatedDataJSON = JSON.stringify(updatedData);
+
+	window.localStorage.setItem(storageName, updatedDataJSON);
+}
+
+function generate(data: GenerateData, length: number) {
+	const {
+		custom,
+		customContent,
+		letters,
+		uppercase,
+		numbers,
+		special
+	} = data;
+
+	if (custom && customContent.length > 0) {
+		const escaped = escapeStringRegexp(customContent);
+
+		const regexp = new RegExp(`[${escaped}]{${length}}`);
+
+		const randexp = new RandExp(regexp);
+
+		const gen = randexp.gen();
+
+		return gen;
+	}
+
+	let content = '';
+
+	if (letters) {
+		content += 'a-z';
+	}
+
+	if (uppercase) {
+		content += 'A-Z';
+	}
+
+	if (numbers) {
+		content += '0-9';
+	}
+
+	if (special) {
+		content += escapeStringRegexp(`!?@#$%&*_-+=()[]{};:,.`);
+	}
+
+	const regexp = new RegExp(`[${content}]{${length}}`);
+
+	const randexp = new RandExp(regexp);
+
+	const gen = randexp.gen();
+
+	return gen;
+}
 
 export const PasswordContext = createContext({} as PasswordContextData);
 
@@ -19,6 +88,17 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 	const [length, setLength] = useState(16);
 
 	const [generated, setGenerated] = useState('');
+
+	const initialData = {
+		letters,
+		uppercase,
+		numbers,
+		special,
+		custom,
+		customContent,
+		length,
+		theme: ''
+	};
 
 	useEffect(() => {
 		const storageName = 'password-generator';
@@ -57,10 +137,23 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 		}
 	}, []);
 
+	useEffect(() => {
+		const password = generate({
+			letters,
+			uppercase,
+			numbers,
+			special,
+			custom,
+			customContent
+		}, length);
+
+		setGenerated(password);
+	}, [letters, uppercase, numbers, special, custom, customContent, length]);
+
 	function handleTheme(choose: string) {
 		setTheme(choose);
 
-		saveOption('theme', choose);
+		saveOption('theme', choose, initialData);
 
 		const body = document.querySelector('body');
 
@@ -74,104 +167,63 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 	}
 
 	function toggleLetters(enable: boolean) {
-		setCustom(false);
-		saveOption('custom', false);
-
-		if (customContent !== '') {
-			setCustomContent('');
-			saveOption('customContent', '');
-		}
-
-		if (generated !== '') {
-			setGenerated('');
-		}
+		toggleCustom(false, false);
+		handleCustomContent('');
 
 		setLetters(enable);
 
-		saveOption('letters', enable);
+		saveOption('letters', enable, initialData);
 	}
 
 	function toggleUppercase(enable: boolean) {
-		setCustom(false);
-		saveOption('custom', false);
-
-		if (customContent !== '') {
-			setCustomContent('');
-			saveOption('customContent', '');
-		}
-
-		if (generated !== '') {
-			setGenerated('');
-		}
+		toggleCustom(false, false);
+		handleCustomContent('');
 
 		setUppercase(enable);
 
-		saveOption('uppercase', enable);
+		saveOption('uppercase', enable, initialData);
 	}
 
 	function toggleNumbers(enable: boolean) {
-		setCustom(false);
-		saveOption('custom', false);
-
-		if (customContent !== '') {
-			setCustomContent('');
-			saveOption('customContent', '');
-		}
-
-		if (generated !== '') {
-			setGenerated('');
-		}
+		toggleCustom(false, false);
+		handleCustomContent('');
 
 		setNumbers(enable);
 
-		saveOption('numbers', enable);
+		saveOption('numbers', enable, initialData);
 	}
 
 	function toggleSpecial(enable: boolean) {
-		setCustom(false);
-		saveOption('custom', false);
-
-		if (customContent !== '') {
-			setCustomContent('');
-			saveOption('customContent', '');
-		}
-
-		if (generated !== '') {
-			setGenerated('');
-		}
+		toggleCustom(false, false);
+		handleCustomContent('');
 
 		setSpecial(enable);
 
-		saveOption('special', enable);
+		saveOption('special', enable, initialData);
 	}
 
-	function toggleCustom(enable: boolean) {
-		toggleLetters(false);
-		toggleUppercase(false);
-		toggleNumbers(false);
-		toggleSpecial(false);
-
-		if (generated !== '') {
-			setGenerated('');
+	function toggleCustom(enable: boolean, disable: boolean = true) {
+		if (disable) {
+			toggleLetters(false);
+			toggleUppercase(false);
+			toggleNumbers(false);
+			toggleSpecial(false);
 		}
 
 		setCustom(enable);
-
-		saveOption('custom', enable);
+		saveOption('custom', enable, initialData);
 	}
 
 	function handleCustomContent(value: string) {
 		setCustomContent(value);
 
-		saveOption('customContent', value);
+		saveOption('customContent', value, initialData);
 	}
 
 	function handleLength(value: number) {
 		setLength(value);
 
-		saveOption('length', value);
-
-		generate(value);
+		saveOption('length', value, initialData);
 	}
 
 	function hasGenerated() {
@@ -182,81 +234,17 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 		return letters || uppercase || numbers || special || (custom && customContent.length > 0);
 	}
 
-	function generate(passwordLength?: number) {
-		if (!isAbleToGenerate()) {
-			return;
-		}
-
-		passwordLength = passwordLength ? passwordLength : length;
-
-		if (custom && customContent.length > 0) {
-			const escaped = escapeStringRegexp(customContent);
-
-			const regexp = new RegExp(`[${escaped}]{${passwordLength}}`);
-
-			const randexp = new RandExp(regexp);
-
-			const gen = randexp.gen();
-
-			setGenerated(gen);
-
-			return;
-		}
-
-		let content = '';
-
-		if (letters) {
-			content += 'a-z';
-		}
-
-		if (uppercase) {
-			content += 'A-Z';
-		}
-
-		if (numbers) {
-			content += '0-9';
-		}
-
-		if (special) {
-			content += escapeStringRegexp(`!?@#$%&*_-+=()[]{};:,.`);
-		}
-
-		const regexp = new RegExp(`[${content}]{${passwordLength}}`);
-
-		const randexp = new RandExp(regexp);
-
-		const gen = randexp.gen();
-
-		setGenerated(gen);
-	}
-
-	function saveOption(option: string, value: boolean | string | number) {
-		const updatedAt = new Date();
-
-		const storageName = 'password-generator';
-		const storage = window.localStorage.getItem(storageName);
-
-		const data = storage ? JSON.parse(storage) : {
+	function handleGenerate() {
+		const password = generate({
 			letters,
 			uppercase,
 			numbers,
 			special,
 			custom,
-			customContent,
-			length,
-			theme: ''
-		};
+			customContent
+		}, length);
 
-		const updatedData = {
-			...data, ...{
-				[option]: value,
-				updatedAt: updatedAt.toISOString()
-			}
-		};
-
-		const updatedDataJSON = JSON.stringify(updatedData);
-
-		window.localStorage.setItem(storageName, updatedDataJSON);
+		setGenerated(password);
 	}
 
 	return (
@@ -280,7 +268,7 @@ export function PasswordProvider({ children }: PasswordProviderProps) {
 			handleLength,
 			hasGenerated,
 			isAbleToGenerate,
-			generate,
+			handleGenerate,
 		}}>
 			{children}
 		</PasswordContext.Provider>

@@ -1,5 +1,14 @@
 import { ReactNode } from 'react';
 
+export type GenerateData = {
+	letters: boolean;
+	uppercase: boolean;
+	numbers: boolean;
+	special: boolean;
+	custom: boolean;
+	customContent: string;
+}
+
 export interface PasswordContextData {
 	theme: string;
 	letters: boolean;
@@ -20,7 +29,7 @@ export interface PasswordContextData {
 	handleLength: (value: number) => void;
 	hasGenerated: () => boolean;
 	isAbleToGenerate: () => boolean;
-	generate: (passwordLength?: number) => void;
+	handleGenerate: () => void;
 };
 
 export interface PasswordProviderProps {

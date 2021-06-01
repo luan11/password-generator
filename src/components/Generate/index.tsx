@@ -16,7 +16,7 @@ export function Generate() {
     handleLength,
     hasGenerated,
     isAbleToGenerate,
-    generate
+    handleGenerate
   } = usePasswordContext();
 
   const inputPasswordRef = useRef<HTMLInputElement>(null);
@@ -77,7 +77,7 @@ export function Generate() {
         style={{
           width: '100%',
         }}
-        onClick={() => generate()}
+        onClick={handleGenerate}
       >
         <FiRotateCw />
         <span>Generate</span>
